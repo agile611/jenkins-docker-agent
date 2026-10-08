@@ -1,0 +1,39 @@
+FROM ubuntu:26.04
+
+# Evitar prompts interactivos durante la instalación de paquetes
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Actualizar e instalar dependencias básicas, Java, Git y SSH
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    openjdk-25-jdk \
+    git \
+    bash \
+    wget \
+    ca-certificates \
+    openssh-server \
+ && rm -rf /var/lib/apt/lists/*
+
+# Configurar variables de entorno para Java
+ENV JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64
+ENV PATH="${JAVA_HOME}/bin:${PATH}"
+
+# Crear usuario jenkins y su directorio .m2
+RUN useradd -m -s /bin/bash jenkins \
+ && echo "jenkins:jenkins" | chpasswd \
+ && mkdir -p /home/jenkins/.m2 \
+ && chown -R jenkins:jenkins /home/jenkins/.m2
+
+# Instalar Apache Maven
+RUN MAVEN_VERSION=3.9.16 \
+ && cd /usr/share \
+ && wget -q https://archive.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz -O - | tar xzf - \
+ && mv /usr/share/apache-maven-$MAVEN_VERSION /usr/share/maven \
+ && ln -s /usr/share/maven/bin/mvn /usr/bin/mvn
+ENV MAVEN_HOME=/usr/share/maven
+
+# Configurar SSH daemon y generar claves del host
+RUN mkdir -p /var/run/sshd \
+ && ssh-keygen -A
+
+EXPOSE 22
+CMD ["/usr/sbin/sshd", "-D"]
