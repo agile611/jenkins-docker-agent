@@ -1,0 +1,36 @@
+FROM debian:13
+
+# Evitar prompts interactivos durante la instalación de paquetes
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Actualizar e instalar dependencias básicas, Java, Git, SSH, herramientas de HashiCorp y Terraform
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    openjdk-25-jdk \
+    git \
+    bash \
+    wget \
+    ca-certificates \
+    openssh-server \
+    gnupg \
+    lsb-release \
+ && wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg \
+ && echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/hashicorp.list \
+ && apt-get update && apt-get install -y --no-install-recommends terraform \
+ && rm -rf /var/lib/apt/lists/*
+
+# Configurar variables de entorno para Java
+ENV JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64
+ENV PATH="${JAVA_HOME}/bin:${PATH}"
+
+# Crear usuario jenkins y su directorio .m2
+RUN useradd -m -s /bin/bash jenkins \
+ && echo "jenkins:jenkins" | chpasswd \
+ && mkdir -p /home/jenkins/.m2 \
+ && chown -R jenkins:jenkins /home/jenkins/.m2
+
+# Configurar SSH daemon y generar claves del host
+RUN mkdir -p /var/run/sshd \
+ && ssh-keygen -A
+
+EXPOSE 22
+CMD ["/usr/sbin/sshd", "-D"]
