@@ -1,0 +1,37 @@
+FROM debian:13
+
+# Evitar prompts interactivos durante la instalación de paquetes
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Actualizar e instalar dependencias básicas, Java, Git, SSH, Python3 y Ansible
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    openjdk-25-jdk \
+    git \
+    bash \
+    wget \
+    ca-certificates \
+    openssh-server \
+    python3 \
+    python3-apt \
+    ansible \
+    sudo \
+ && rm -rf /var/lib/apt/lists/*
+
+# Configurar variables de entorno para Java
+ENV JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64
+ENV PATH="${JAVA_HOME}/bin:${PATH}"
+
+# Crear usuario jenkins, su directorio .m2 y darle permisos sudo
+RUN useradd -m -s /bin/bash jenkins \
+ && echo "jenkins:jenkins" | chpasswd \
+ && mkdir -p /home/jenkins/.m2 \
+ && chown -R jenkins:jenkins /home/jenkins/.m2 \
+ && usermod -aG sudo jenkins \
+ && echo "jenkins ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+# Configurar SSH daemon y generar claves del host
+RUN mkdir -p /var/run/sshd \
+ && ssh-keygen -A
+
+EXPOSE 22
+CMD ["/usr/sbin/sshd", "-D"]
