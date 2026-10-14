@@ -72,6 +72,14 @@ Published images will be available as `your-docker-hub-username/jenkins-agent:<t
 
 The Dockerfiles set the default password for the `jenkins` user to `jenkins`. This is fine for a trusted environment and local testing, but before using an image outside a private network, change the password and restrict access to SSH port 22.
 
-## License
+## License and Support
 
-This project is licensed under the GNU General Public License v3.0. See [LICENSE](./LICENSE) for details.
+Published by [Agile611](http://www.agile611.com/) under the **Creative Commons Attribution-NonCommercial 4.0 International** license.
+
+[![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC_BY--NC_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc/4.0/)
+
+README written by [Guillem Hernández Sola](https://www.linkedin.com/in/guillemhs/).
+
+## Contact
+- 🌐 [agile611.com](http://www.agile611.com/)
+- 📍 Carrer Laureà Miró 309, 08950 Esplugues de Llobregat (Barcelona)
