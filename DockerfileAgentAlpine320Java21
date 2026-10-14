@@ -1,0 +1,22 @@
+FROM alpine:3.20
+
+ENV JAVA_HOME=/usr/lib/jvm/java-1.8-openjdk
+ENV PATH="${JAVA_HOME}/bin:${PATH}"
+
+RUN apk add --no-cache \
+    openjdk21-jdk \
+    git \
+    bash \
+    openssh \
+    ca-certificates
+
+RUN adduser -D jenkins \
+ && echo "jenkins:jenkins" | chpasswd \
+ && mkdir -p /home/jenkins/.m2 \
+ && chown -R jenkins:jenkins /home/jenkins/.m2
+
+RUN mkdir -p /var/run/sshd \
+ && ssh-keygen -A
+
+EXPOSE 22
+CMD ["/usr/sbin/sshd", "-D"]
