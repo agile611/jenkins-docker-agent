@@ -78,7 +78,7 @@ The Dockerfiles set the default password for the `jenkins` user to `jenkins`. Th
 
 README written by [Guillem Hernández Sola](https://www.linkedin.com/in/guillemhs/).
 
-## Contact
+## Contact
 
 - 🌐 [agile611.com](http://www.agile611.com/)
 - 📍 Carrer Laureà Miró 309, 08950 Esplugues de Llobregat (Barcelona)
