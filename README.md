@@ -1,29 +1,42 @@
 # Jenkins SSH build agents
 
-This repository contains Docker images for Jenkins build agents that accept SSH connections. Each image starts `sshd` on port 22; configure the Jenkins SSH build-agent connection separately.
+This repository contains Docker images for Jenkins agents that connect over SSH. Each image runs `sshd` on port 22 and creates a `jenkins` user. 
 
-## Images
+The Jenkins SSH build-agent connection is configured separately in Jenkins; this repository only provides the runtime environment.
 
-| Dockerfile | Contents | Suggested Docker Hub tag |
-| --- | --- | --- |
-| `DockerfileAgentAlpine324` | Alpine 3.24, OpenJDK 25, Git, Bash, Maven 3.9.16, OpenSSH | `alpine324` |
-| `DockerfileAgentAnsible` | Debian 13, OpenJDK 25, Git, Bash, OpenSSH, Python 3, Ansible, sudo | `ansible` |
-| `DockerfileAgentDebian13` | Debian 13, OpenJDK 25, Git, Bash, OpenSSH | `debian13` |
-| `DockerfileAgentLight` | Alpine 3.24, OpenJDK 25, Git, Bash, OpenSSH | `light` |
-| `DockerfileAgentTerraform` | Debian 13, OpenJDK 25, Git, Bash, OpenSSH, Terraform | `terraform` |
-| `DockerfileAgentUbuntu2604` | Ubuntu 26.04, OpenJDK 25, Git, Bash, OpenSSH, Maven 3.9.16 | `ubuntu2604` |
+> [!NOTE]
+> Before using these images in Jenkins, make sure the following is already configured:
+> - the Docker plugin is installed and enabled in Jenkins
+> - the SSH Agent plugin is installed and enabled in Jenkins
+> - a Docker Cloud is already configured in Jenkins, since these agent images are meant to be launched from that cloud
 
-`DockerfileAlpine37` is a legacy image based on Alpine 3.7 and is not included in the current build and publish commands below.
+The image set is focused on Java-based build workloads, with additional variants for common tools such as Maven, Ansible, Terraform, and lightweight Alpine base images.
 
-## Build an image
+## Available images
 
-Run commands from the repository root. For example, build the Debian 13 agent locally:
+| Dockerfile | Base image | Included tools | Suggested Docker Hub tag |
+| --- | --- | --- | --- |
+| `DockerfileAgentAlpine320Java21` | Alpine 3.20 | OpenJDK 21, Git, Bash, OpenSSH | `alpine320-java21` |
+| `DockerfileAgentAlpine324Java25` | Alpine 3.24.2 | OpenJDK 25, Git, Bash, OpenSSH | `alpine324-java25` |
+| `DockerfileAgentAlpine324Java25Maven3916` | Alpine 3.24.2 | OpenJDK 25, Git, Bash, OpenSSH, Maven 3.9.16 | `alpine324-java25-maven3916` |
+| `DockerfileAgentAnsible` | Debian 13 | OpenJDK 25, Git, Bash, OpenSSH, Python 3, Ansible, sudo | `ansible` |
+| `DockerfileAgentDebian13Java25` | Debian 13 | OpenJDK 25, Git, Bash, OpenSSH | `debian13-java25` |
+| `DockerfileAgentTerraform` | Debian 13 | OpenJDK 25, Git, Bash, OpenSSH, Terraform | `terraform` |
+| `DockerfileAgentUbuntu2604Java25Mvn3916` | Ubuntu 26.04 | OpenJDK 25, Git, Bash, OpenSSH, Maven 3.9.16 | `ubuntu2604-java25-maven3916` |
+
+Each image is designed to be connected to Jenkins as an SSH build agent. 
+
+They all expose port 22 and start the SSH daemon by default.
+
+## Build a local image
+
+Run the build from the repository root. For example, to build the Debian 13 Java 25 agent locally:
 
 ```sh
-docker build -f DockerfileAgentDebian13 -t jenkins-agent:debian13 .
+docker build -f DockerfileAgentDebian13Java25 -t jenkins-agent:debian13-java25 .
 ```
 
-Change the Dockerfile and tag to build another variant.
+Use the Dockerfile that matches your workload, and change the tag to match your preferred naming convention.
 
 ## Build and publish all current agents
 
@@ -34,12 +47,13 @@ export DOCKERHUB_USERNAME=your-docker-hub-username
 docker login --username "$DOCKERHUB_USERNAME"
 
 images=(
-  "DockerfileAgentAlpine324:alpine324"
+  "DockerfileAgentAlpine320Java21:alpine320-java21"
+  "DockerfileAgentAlpine324Java25:alpine324-java25"
+  "DockerfileAgentAlpine324Java25Maven3916:alpine324-java25-maven3916"
   "DockerfileAgentAnsible:ansible"
-  "DockerfileAgentDebian13:debian13"
-  "DockerfileAgentLight:light"
+  "DockerfileAgentDebian13Java25:debian13-java25"
   "DockerfileAgentTerraform:terraform"
-  "DockerfileAgentUbuntu2604:ubuntu2604"
+  "DockerfileAgentUbuntu2604Java25Mvn3916:ubuntu2604-java25-maven3916"
 )
 
 for image in "${images[@]}"; do
@@ -52,11 +66,11 @@ for image in "${images[@]}"; do
 done
 ```
 
-Published images will be available as `your-docker-hub-username/jenkins-agent:<tag>`, for example `your-docker-hub-username/jenkins-agent:debian13`.
+Published images will be available as `your-docker-hub-username/jenkins-agent:<tag>`, for example `your-docker-hub-username/jenkins-agent:debian13-java25`.
 
 ## Security note
 
-The current Dockerfiles set the `jenkins` user's password to `jenkins`. Change that credential before using an image outside a trusted environment, and restrict access to SSH port 22.
+The Dockerfiles set the default password for the `jenkins` user to `jenkins`. This is fine for a trusted environment and local testing, but before using an image outside a private network, change the password and restrict access to SSH port 22.
 
 ## License
 
