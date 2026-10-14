@@ -1,4 +1,4 @@
-# Jenkins SSH build agents
+# Agile611 Jenkins SSH build agents
 
 This repository contains Docker images for Jenkins agents that connect over SSH. Each image runs `sshd` on port 22 and creates a `jenkins` user. 
 
