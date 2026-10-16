@@ -1,0 +1,25 @@
+FROM debian:13
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Instalar Java, Git, SSH y sudo (necesario para que jenkins instale paquetes)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    openjdk-25-jdk-headless \
+    git \
+    openssh-server \
+    sudo \
+ && rm -rf /var/lib/apt/lists/*
+
+# Configurar variables de entorno para Java
+ENV JAVA_HOME=/usr/lib/jvm/java-25-openjdk-amd64
+ENV PATH="${JAVA_HOME}/bin:${PATH}"
+
+# Crear usuario jenkins, darle permisos de sudo sin password y preparar SSH
+RUN useradd -m -s /bin/bash jenkins \
+ && echo "jenkins:jenkins" | chpasswd \
+ && echo "jenkins ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/jenkins \
+ && mkdir -p /var/run/sshd \
+ && ssh-keygen -A
+
+EXPOSE 22
+CMD ["/usr/sbin/sshd", "-D"]
