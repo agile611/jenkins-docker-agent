@@ -1,0 +1,28 @@
+FROM alpine:3.24.2
+
+# Configurar variables de entorno de Java y PATH
+ENV JAVA_HOME=/usr/lib/jvm/default-jvm
+ENV PATH="${JAVA_HOME}/bin:${PATH}"
+
+# 1. Instalar todas las dependencias en una sola capa (Java, Git, SSH, Node.js y gcompat)
+RUN apk add --no-cache \
+    openjdk25 \
+    git \
+    bash \
+    openssh \
+    nodejs \
+    npm \
+    gcompat
+
+# 2. Crear el usuario jenkins y preparar el directorio .m2
+RUN adduser -D jenkins \
+ && echo "jenkins:jenkins" | chpasswd \
+ && mkdir -p /home/jenkins/.m2 \
+ && chown -R jenkins:jenkins /home/jenkins/.m2
+
+# 3. Configurar el servidor SSH y generar las claves de host automáticamente
+RUN mkdir -p /var/run/sshd \
+ && ssh-keygen -A
+
+EXPOSE 22
+CMD ["/usr/sbin/sshd", "-D"]
