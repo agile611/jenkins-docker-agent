@@ -19,6 +19,7 @@ The image set is focused on Java-based build workloads, with additional variants
 | `DockerfileAgentAlpine320Java21` | Alpine 3.20 | OpenJDK 21, Git, Bash, OpenSSH | `alpine320-java21` |
 | `DockerfileAgentAlpine324Java25` | Alpine 3.24.2 | OpenJDK 25, Git, Bash, OpenSSH | `alpine324-java25` |
 | `DockerfileAgentAlpine324Java25Maven3916` | Alpine 3.24.2 | OpenJDK 25, Git, Bash, OpenSSH, Maven 3.9.16 | `alpine324-java25-maven3916` |
+| `DockerfileAgentAlpine324Java25NodeJS` | Alpine 3.24.2 | OpenJDK 25, Git, Bash, OpenSSH, Node.js, npm | `alpine324-java25-nodejs` |
 | `DockerfileAgentAnsible` | Debian 13 | OpenJDK 25, Git, Bash, OpenSSH, Python 3, Ansible, sudo | `ansible` |
 | `DockerfileAgentDebian13Java25` | Debian 13 | OpenJDK 25, Git, Bash, OpenSSH | `debian13-java25` |
 | `DockerfileAgentTerraform` | Debian 13 | OpenJDK 25, Git, Bash, OpenSSH, Terraform | `terraform` |
@@ -50,6 +51,7 @@ images=(
   "DockerfileAgentAlpine320Java21:alpine320-java21"
   "DockerfileAgentAlpine324Java25:alpine324-java25"
   "DockerfileAgentAlpine324Java25Maven3916:alpine324-java25-maven3916"
+  "DockerfileAgentAlpine324Java25NodeJS:alpine324-java25-nodejs"
   "DockerfileAgentAnsible:ansible"
   "DockerfileAgentDebian13Java25:debian13-java25"
   "DockerfileAgentTerraform:terraform"
